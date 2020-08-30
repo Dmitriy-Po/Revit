@@ -1,0 +1,13 @@
+C:\Users\Дмитрий\source\repos\ClassLibrary1\ClassLibrary1\obj\Debug\Views\UserControl1.g.cs
+C:\Users\Дмитрий\source\repos\ClassLibrary1\ClassLibrary1\obj\Debug\ClassLibrary1_MarkupCompile.cache
+C:\Users\Дмитрий\source\repos\ClassLibrary1\ClassLibrary1\obj\Debug\ClassLibrary1_MarkupCompile.lref
+C:\Users\Дмитрий\source\repos\ClassLibrary1\ClassLibrary1\bin\Debug\ClassLibrary1.dll
+C:\Users\Дмитрий\source\repos\ClassLibrary1\ClassLibrary1\bin\Debug\ClassLibrary1.pdb
+C:\Users\Дмитрий\source\repos\ClassLibrary1\ClassLibrary1\obj\Debug\Views\CategoryForm.g.cs
+C:\Users\Дмитрий\source\repos\ClassLibrary1\ClassLibrary1\obj\Debug\Views\CategoryForm.baml
+C:\Users\Дмитрий\source\repos\ClassLibrary1\ClassLibrary1\obj\Debug\Views\UserControl1.baml
+C:\Users\Дмитрий\source\repos\ClassLibrary1\ClassLibrary1\obj\Debug\ClassLibrary1.g.resources
+C:\Users\Дмитрий\source\repos\ClassLibrary1\ClassLibrary1\obj\Debug\ClassLibrary1.csproj.CoreCompileInputs.cache
+C:\Users\Дмитрий\source\repos\ClassLibrary1\ClassLibrary1\obj\Debug\ClassLibrary1.dll
+C:\Users\Дмитрий\source\repos\ClassLibrary1\ClassLibrary1\obj\Debug\ClassLibrary1.pdb
+C:\Users\Дмитрий\source\repos\ClassLibrary1\ClassLibrary1\obj\Debug\ClassLibrary1.csprojAssemblyReference.cache

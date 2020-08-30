@@ -1,0 +1,57 @@
+﻿<Window x:Class="ClassLibrary1.ViewRoom"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ClassLibrary1"
+             mc:Ignorable="d" 
+             Height="500" Width="500" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="ToolWindow" Background="#FF37E66F">
+    <Grid Background="#FF47EBFB">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70" />
+            <RowDefinition />
+            <RowDefinition Height="70"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <DataGrid 
+            Name="dgRoomsName"
+            Grid.Row="1"
+            Grid.ColumnSpan="2"
+            AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn 
+                    Header="Имя комнаты" 
+                    Binding="{Binding Path = RoomName}"
+                    Width="*" />
+                <DataGridTextColumn 
+                    Header="Площадь комнаты (кв. метры)"
+                    Binding="{Binding Path = RoomArea}"
+                    Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button
+            Name="GetRooms"
+            Grid.Row="2"
+            Grid.Column="0"
+            Width="200" 
+            Height="40" 
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Content="Get"
+            FontSize="20" Click="GetRooms_Click"/>
+        <Button 
+            Name="SetNewNameRoom"
+            Grid.Row="2"
+            Grid.Column="1"
+            Width="200" 
+            Height="40" 
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Content="Set"
+            FontSize="20" Click="SetNewNameRoom_Click"/>
+    </Grid>
+</Window>
