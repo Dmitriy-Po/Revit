@@ -77,17 +77,11 @@ namespace ClassLibrary1.ViewModel
 
                 foreach (UserView view in userViews)
                 {
-                    Category selectedCategories = 
-                        categories.get_Item(SelectedCategori.NameCategori);
-
+                    Category selectedCategories = categories.get_Item(SelectedCategori.NameCategori);
                     if (view.View.CanCategoryBeHidden(selectedCategories.Id))
                     {
                         view.View.SetCategoryHidden(selectedCategories.Id, !view.StatusOfVisible);
                     }
-
-                    //categories
-                    //    .get_Item(SelectedCategori.NameCategori)
-                    //    .set_Visible(view.View, view.StatusOfVisible);
                 }
                 transaction.Commit();
             }
@@ -107,8 +101,7 @@ namespace ClassLibrary1.ViewModel
             var selectedViews = views
                 .Where(s => s.ViewType == ViewType.ThreeD
                 || s.ViewType == ViewType.Section
-                || s.ViewType == ViewType.FloorPlan
-                || s.ViewType == ViewType.DrawingSheet);
+                || s.ViewType == ViewType.FloorPlan);
 
             foreach (Category category in cats)
             {
@@ -133,7 +126,7 @@ namespace ClassLibrary1.ViewModel
                     new UserView()
                     {
                         NameUIView = view.Title,
-                        StatusOfVisible = category.get_Visible(uIDocument.ActiveView),
+                        StatusOfVisible = category.get_Visible(view),
                         View = view
                     });
             }
