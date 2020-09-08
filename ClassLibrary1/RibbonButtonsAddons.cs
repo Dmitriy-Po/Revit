@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 
 
@@ -210,7 +211,7 @@ namespace ClassLibrary1
                         // Если текущий элемент, по значению ROM_Зона совпадает с предыдущим, то это значит, что комнаты имеют сквозную нумерацию.
                         // Уточнение: условие выполнится если, значение текущего элемента по параметру ROM_Зона уменьшенного на единицу, совпадает с предыдущим элементом.
                         // Пример: текущий_элемент.Квартира (07 -1) == предыдущий_элемент.Квартира (06).					
-                        if (ROMStringToInt(groupOfRooms.Key.ROM_Зона) - 1 == ROMStringToInt(previorsRoom))
+                        if (ROMStringToInt(groupOfRooms.Key.ROM_Зона)-1 == ROMStringToInt(previorsRoom))
                         {
                             SetNewValues(groupOfRooms);
                         }
@@ -228,8 +229,9 @@ namespace ClassLibrary1
         {
             foreach (var room in groupOfRooms)
             {
-                Parameter ROM_index = room.GetParameters("ROM_Подзона_Index").FirstOrDefault();
+                Parameter ROM_index = room.LookupParameter("ROM_Подзона_Index");
                 string ROM_under_index = room.GetParameters("ROM_Подзона_ID").FirstOrDefault().AsString();
+                
 
                 // Присовить формат будущего значения, например: "2к.Полутон".
                 // TODO: добавить проверку данного, если такое значение уже существует.
@@ -237,16 +239,15 @@ namespace ClassLibrary1
             }
         }
 
-
         /// <summary>
-		/// Функция для преобразования строкового представления в целое, по параметру - ROM_Зона.
-		/// </summary>
-		/// <returns></returns>
+        /// Функция для преобразования строкового представления в целое.
+        /// </summary>
+        /// <param name="nameRoom">Наименование квартиры.</param>
+        /// <returns>Целое число - номер квартиры.</returns>
 		private int ROMStringToInt(string nameRoom)
         {
-            // Номер квартиры получаем через первый найденный пробел, после которого, следует номер квартиры.
-            // TODO сделать проверку через регулярные выражения.
-            string numberRoom = nameRoom.Substring(nameRoom.IndexOf(" "));
+            // Выбрать первое попавшееся совпадение - номер квартиры.
+            string numberRoom = new Regex(@"\d+", RegexOptions.IgnoreCase).Match(nameRoom).Value;
 
             return int.Parse(numberRoom);
         }
