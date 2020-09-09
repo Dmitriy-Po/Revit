@@ -188,13 +188,13 @@ namespace ClassLibrary1
                       (
                           g => new
                           {
-                              Уровнеь = g.GetParameters("Уровень").FirstOrDefault().Element.LevelId,
+                              Уровнеь = g.LevelId,
                               BS_Блок = g.GetParameters("BS_Блок").FirstOrDefault().AsString(),
                               ROM_Подзона = g.GetParameters("ROM_Подзона").FirstOrDefault().AsString(),
                               ROM_Зона = g.GetParameters("ROM_Зона").FirstOrDefault().AsString()
                           }
                       )
-                   .OrderBy(o => o.Key.ROM_Зона)
+                   .OrderBy(o => o.Key.Уровнеь.IntegerValue)
                    .ThenBy(t => t.Key.BS_Блок)
                    .ThenBy(t => t.Key.ROM_Подзона)
                    .ThenBy(t => t.Key.ROM_Зона);
@@ -204,6 +204,8 @@ namespace ClassLibrary1
             using (Transaction transaction = new Transaction(DOC, "Set new Values"))
             {
                 transaction.Start();
+                bool ПредыдущаяКомнатаБылаРаскрашена = false;
+
                 foreach (var groupOfRooms in allRooms)
                 {
                     if (previorsRoom != "")
@@ -211,9 +213,15 @@ namespace ClassLibrary1
                         // Если текущий элемент, по значению ROM_Зона совпадает с предыдущим, то это значит, что комнаты имеют сквозную нумерацию.
                         // Уточнение: условие выполнится если, значение текущего элемента по параметру ROM_Зона уменьшенного на единицу, совпадает с предыдущим элементом.
                         // Пример: текущий_элемент.Квартира (07 -1) == предыдущий_элемент.Квартира (06).					
-                        if (ROMStringToInt(groupOfRooms.Key.ROM_Зона)-1 == ROMStringToInt(previorsRoom))
+                        if ((ROMStringToInt(groupOfRooms.Key.ROM_Зона)-1 == ROMStringToInt(previorsRoom))
+                            && !ПредыдущаяКомнатаБылаРаскрашена)
                         {
                             SetNewValues(groupOfRooms);
+                            ПредыдущаяКомнатаБылаРаскрашена = true;
+                        }
+                        else
+                        {
+                            ПредыдущаяКомнатаБылаРаскрашена = false;
                         }
                     }
                     previorsRoom = groupOfRooms.Key.ROM_Зона;
@@ -230,8 +238,7 @@ namespace ClassLibrary1
             foreach (var room in groupOfRooms)
             {
                 Parameter ROM_index = room.LookupParameter("ROM_Подзона_Index");
-                string ROM_under_index = room.GetParameters("ROM_Подзона_ID").FirstOrDefault().AsString();
-                
+                string ROM_under_index = room.GetParameters("ROM_Подзона_ID").FirstOrDefault().AsString();                
 
                 // Присовить формат будущего значения, например: "2к.Полутон".
                 // TODO: добавить проверку данного, если такое значение уже существует.
