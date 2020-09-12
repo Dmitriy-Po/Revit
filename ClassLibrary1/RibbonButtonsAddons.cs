@@ -180,7 +180,7 @@ namespace ClassLibrary1
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             Document DOC = commandData.Application.ActiveUIDocument.Document;
-            var allRooms = new FilteredElementCollector(DOC)
+            var allApartments = new FilteredElementCollector(DOC)
                    .WherePasses(new RoomFilter())
                    .Where(w => w.LookupParameter("ROM_Зона").AsString().Contains("Квартира"))
                    .ToList()
@@ -197,53 +197,74 @@ namespace ClassLibrary1
                    .OrderBy(o => o.Key.Уровнеь.IntegerValue)
                    .ThenBy(t => t.Key.BS_Блок)
                    .ThenBy(t => t.Key.ROM_Подзона)
-                   .ThenBy(t => t.Key.ROM_Зона);
+                   .ThenBy(t => ROMStringToInt(t.Key.ROM_Зона));
 
-            string previorsRoom = "";
+            
 
             using (Transaction transaction = new Transaction(DOC, "Set new Values"))
             {
-                transaction.Start();
-                bool ПредыдущаяКомнатаБылаРаскрашена = false;
-
-                foreach (var groupOfRooms in allRooms)
+                try
                 {
-                    if (previorsRoom != "")
+                    transaction.Start();
+                    string numberPreviorsRoom = "";
+                    bool квартираРаскрашена = false;
+
+                    foreach (IGrouping<object, Element> apartment in allApartments)
                     {
-                        // Если текущий элемент, по значению ROM_Зона совпадает с предыдущим, то это значит, что комнаты имеют сквозную нумерацию.
-                        // Уточнение: условие выполнится если, значение текущего элемента по параметру ROM_Зона уменьшенного на единицу, совпадает с предыдущим элементом.
-                        // Пример: текущий_элемент.Квартира (07 -1) == предыдущий_элемент.Квартира (06).					
-                        if ((ROMStringToInt(groupOfRooms.Key.ROM_Зона)-1 == ROMStringToInt(previorsRoom))
-                            && !ПредыдущаяКомнатаБылаРаскрашена)
+                        string numberCurrentRoom = apartment.FirstOrDefault().GetParameters("ROM_Зона").FirstOrDefault().AsString();
+
+                        if (numberPreviorsRoom != "")
                         {
-                            SetNewValues(groupOfRooms);
-                            ПредыдущаяКомнатаБылаРаскрашена = true;
+                            if ((ROMStringToInt(numberCurrentRoom) - 1) == ROMStringToInt(numberPreviorsRoom) && !квартираРаскрашена)
+                            {
+                                SetNewValues(apartment);
+                                квартираРаскрашена = true;
+                            }
+                            else
+                            {
+                                квартираРаскрашена = false;
+                            }
                         }
-                        else
-                        {
-                            ПредыдущаяКомнатаБылаРаскрашена = false;
-                        }
+                        numberPreviorsRoom = numberCurrentRoom;
                     }
-                    previorsRoom = groupOfRooms.Key.ROM_Зона;
+                    transaction.Commit();
                 }
-                transaction.Commit();
+                catch (Exception)
+                {
+                    transaction.RollBack();
+                }
             }
 
             return Result.Succeeded;
         }
 
-
-        private void SetNewValues(IGrouping<object, Element> groupOfRooms)
+        /// <summary>
+        /// Функция устанавливает полутона у квартир, что расположенны рядом,
+        /// согласно группировке в методе FilteredElementCollector.
+        /// </summary>
+        /// <param name="apartment">Сгруппированные помещения - квартира.</param>
+        private void SetNewValues(IGrouping<object, Element> apartment)
         {
-            foreach (var room in groupOfRooms)
+            foreach (Element room in apartment)
             {
-                Parameter ROM_index = room.LookupParameter("ROM_Подзона_Index");
-                string ROM_under_index = room.GetParameters("ROM_Подзона_ID").FirstOrDefault().AsString();                
-
-                // Присовить формат будущего значения, например: "2к.Полутон".
-                // TODO: добавить проверку данного, если такое значение уже существует.
-                ROM_index.Set(ROM_under_index + ".Полутон");
+                // Задаётся новый параметр - полутон, для всех помещений в квартире.
+                SetNewParameterForROMIndex(room);
             }
+        }
+
+
+        /// <summary>
+        /// Функция добавляет новый параметр в список параметров ROM_index - устанавливает новый параметр для полутона.
+        /// </summary>
+        /// <param name="room">Объект комната.</param>
+        private void SetNewParameterForROMIndex(Element room)
+        {
+            Parameter ROM_index = room.LookupParameter("ROM_Подзона_Index");
+            string ROM_under_index = room.GetParameters("ROM_Подзона_ID").FirstOrDefault().AsString();
+
+            // Присовить формат будущего значения, например: "2к.Полутон".
+            // TODO: добавить проверку данного, если такое значение уже существует.
+            ROM_index.Set(ROM_under_index + ".Полутон");
         }
 
         /// <summary>
