@@ -184,16 +184,16 @@ namespace ClassLibrary1
                    .WherePasses(new RoomFilter())
                    .Where(w => w.LookupParameter("ROM_Зона").AsString().Contains("Квартира"))
                    .ToList()
-                      .GroupBy
-                      (
-                          g => new
-                          {
-                              Уровнеь = g.LevelId,
-                              BS_Блок = g.GetParameters("BS_Блок").FirstOrDefault().AsString(),
-                              ROM_Подзона = g.GetParameters("ROM_Подзона").FirstOrDefault().AsString(),
-                              ROM_Зона = g.GetParameters("ROM_Зона").FirstOrDefault().AsString()
-                          }
-                      )
+                   .GroupBy
+                   (
+                       g => new
+                       {
+                           Уровнеь = g.LevelId,
+                           BS_Блок = g.GetParameters("BS_Блок").FirstOrDefault().AsString(),
+                           ROM_Подзона = g.GetParameters("ROM_Подзона").FirstOrDefault().AsString(),
+                           ROM_Зона = g.GetParameters("ROM_Зона").FirstOrDefault().AsString()
+                       }
+                   )
                    .OrderBy(o => o.Key.Уровнеь.IntegerValue)
                    .ThenBy(t => t.Key.BS_Блок)
                    .ThenBy(t => t.Key.ROM_Подзона)
@@ -208,14 +208,17 @@ namespace ClassLibrary1
                     transaction.Start();
                     string numberPreviorsRoom = "";
                     bool квартираРаскрашена = false;
+                    Element pervApartment = null;
 
                     foreach (IGrouping<object, Element> apartment in allApartments)
                     {
                         string numberCurrentRoom = apartment.FirstOrDefault().GetParameters("ROM_Зона").FirstOrDefault().AsString();
 
-                        if (numberPreviorsRoom != "")
+                        if (numberPreviorsRoom != "" && pervApartment != null)
                         {
-                            if ((ROMStringToInt(numberCurrentRoom) - 1) == ROMStringToInt(numberPreviorsRoom) && !квартираРаскрашена)
+                            if (CheckTwoNumberRooms(numberCurrentRoom, numberPreviorsRoom)
+                                && CheckTwoApartments(apartment, pervApartment)
+                                && !квартираРаскрашена)
                             {
                                 SetNewValues(apartment);
                                 квартираРаскрашена = true;
@@ -226,16 +229,48 @@ namespace ClassLibrary1
                             }
                         }
                         numberPreviorsRoom = numberCurrentRoom;
+                        pervApartment = apartment.Cast<Element>().FirstOrDefault();
                     }
                     transaction.Commit();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     transaction.RollBack();
+                    TaskDialog.Show("Exeption", ex.Message);
                 }
             }
 
             return Result.Succeeded;
+        }
+
+
+        /// <summary>
+        /// Функция проверяет, что номер текущей квартиры, уменьшенного на единицу, равен номеру предыдущей квартиры.
+        /// </summary>
+        /// <param name="numberCurrRoom">Номер текущей квартиры.</param>
+        /// <param name="numberPrevRoom">Номер предыдущей квартиры.</param>
+        /// <returns>>True - если условие функции выполняется.</returns>
+        private bool CheckTwoNumberRooms(string numberCurrRoom, string numberPrevRoom)
+        {
+            return (ROMStringToInt(numberCurrRoom) - 1) == ROMStringToInt(numberPrevRoom);
+        }
+
+        /// <summary>
+        /// Функция проверяет, что текущая квартира совпадает по параметрам (этаж, блок, подзона), с предыдущей.
+        /// Это позволит избежать совпадений квартир из разных этажей, блоков и подзон.
+        /// </summary>
+        private bool CheckTwoApartments(IGrouping<object, Element> currApartment, Element pervApartment)
+        {
+            if (currApartment.Cast<Element>().FirstOrDefault().LevelId == pervApartment.LevelId
+                && currApartment.Cast<Element>().FirstOrDefault().GetParameters("BS_Блок").FirstOrDefault().AsString() == pervApartment.GetParameters("BS_Блок").FirstOrDefault().AsString()
+                && currApartment.Cast<Element>().FirstOrDefault().GetParameters("ROM_Подзона").FirstOrDefault().AsString() == pervApartment.GetParameters("ROM_Подзона").FirstOrDefault().AsString())
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
