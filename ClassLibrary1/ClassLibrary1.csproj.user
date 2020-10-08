@@ -8,4 +8,7 @@
     <StartProgram>E:\Programs\Revit 2019\Revit.exe</StartProgram>
     <StartAction>Program</StartAction>
   </PropertyGroup>
+  <PropertyGroup>
+    <ProjectView>ProjectFiles</ProjectView>
+  </PropertyGroup>
 </Project>

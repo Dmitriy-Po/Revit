@@ -73,6 +73,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DeijkstraFolder\Dijkstra.cs" />
+    <Compile Include="DeijkstraFolder\Graph.cs" />
+    <Compile Include="DeijkstraFolder\GraphEdge.cs" />
+    <Compile Include="DeijkstraFolder\GraphVertex.cs" />
+    <Compile Include="DeijkstraFolder\GraphVertexInfo.cs" />
     <Compile Include="Models\UserView.cs" />
     <Compile Include="ViewModel\SaveChanges.cs" />
     <Compile Include="ViewModel\VMCategori.cs" />
